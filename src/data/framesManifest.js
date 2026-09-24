@@ -98,7 +98,9 @@ export const FRAME_LIST = [
   "frame_000096.png"
 ];
 export const FRAME_COUNT = 96;
-export const FRAME_PREFIX = '/Frames/';
+const _rawBase = import.meta.env.BASE_URL || './';
+const _cleanBase = _rawBase.endsWith('/') ? _rawBase : _rawBase + '/';
+export const FRAME_PREFIX = `${_cleanBase}Frames/`;
 
 export function getFrameUrl(index) {
   const safeIndex = Math.max(0, Math.min(index, FRAME_COUNT - 1));

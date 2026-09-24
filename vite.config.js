@@ -24,7 +24,9 @@ function ensureFramesManifest() {
     const manifestContent = `// Auto-generated frame manifest
 export const FRAME_LIST = ${JSON.stringify(frameFiles, null, 2)};
 export const FRAME_COUNT = ${frameFiles.length};
-export const FRAME_PREFIX = '/Frames/';
+const _rawBase = import.meta.env.BASE_URL || './';
+const _cleanBase = _rawBase.endsWith('/') ? _rawBase : _rawBase + '/';
+export const FRAME_PREFIX = \`\${_cleanBase}Frames/\`;
 
 export function getFrameUrl(index) {
   const safeIndex = Math.max(0, Math.min(index, FRAME_COUNT - 1));
@@ -50,7 +52,7 @@ function framesPlugin() {
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const url = decodeURIComponent(req.url || '');
-        if (url.startsWith('/Frames/') || url.startsWith('/frames/')) {
+        if (url.includes('/Frames/') || url.includes('/frames/')) {
           const fileName = url.split('/').pop()?.split('?')[0];
           const filePath = resolve(import.meta.dirname, 'Frames', fileName || '');
           if (fs.existsSync(filePath)) {
@@ -81,6 +83,7 @@ function framesPlugin() {
 }
 
 export default defineConfig({
+  base: './', // CRITICAL for GitHub Pages subfolder hosting
   root: '.',
   publicDir: 'public',
   plugins: [framesPlugin()],
